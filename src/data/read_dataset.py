@@ -15,7 +15,10 @@ num_examples = len(cartesian_coordinates)
 num_rows = 56
 num_cols = 56
 
-def get_indices(split='quadrant'):
+num_training_examples = 2352
+num_testing_examples = 784
+
+def get_indices(split='uniform'):
     """
     Get training and testing indices.
 
@@ -49,7 +52,6 @@ def get_data(start_index, indices, batch_size):
     Args:
         start_index: Start index of data we want.
         indices: List of complete indices from which we will be selecting.
-        batch_size: How large a batch of data we are getting.
     Returns:
         cartesian_coordinates: xy coordinates of data.
         pixel_centers: Subset of data with pixel centers highlighted.
@@ -64,9 +66,12 @@ def get_data(start_index, indices, batch_size):
     # Edit the dimensionality of the data so it fits properly into placeholders
     cartesian_coordinates_batch = np.expand_dims(
             cartesian_coordinates_batch, axis=1)
-    cartesian_coordinates_batch = np.expand_dims(
-            cartesian_coordinates_batch, axis=1)
+    cartesian_coordinates_batch = np.repeat(
+        cartesian_coordinates_batch, 64*64, axis=1)
+    cartesian_coordinates_batch = np.reshape(
+        cartesian_coordinates_batch, [batch_size, 64, 64, 2])
     pixel_centers_batch = np.expand_dims(pixel_centers_batch, axis=-1)
+    pixel_centers_batch = np.reshape(pixel_centers_batch, [batch_size, 4096])
     image_squares_batch = np.expand_dims(image_squares_batch, axis=-1)
 
     return cartesian_coordinates_batch, pixel_centers_batch, image_squares_batch
