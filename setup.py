@@ -4,7 +4,7 @@ setup(
     name='src',
     packages=find_packages(),
     version='0.1.0',
-    description='Take a pixel image and convert it into a single line drawing in vector graphic format using Fourier transforms.',
+    description='Replicate CoordConv Not-So-Clever experiments.',
     author='ash',
     license='',
 )
