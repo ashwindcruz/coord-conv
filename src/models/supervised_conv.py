@@ -23,7 +23,7 @@ def model_classification(input_tensor):
 		conv_4 = tf.layers.conv2d(
 			conv_3, 64, 1, activation='relu', name='conv_4')
 		conv_5 = tf.layers.conv2d(
-			conv_4, 1, 1, activation='relu', name='conv_5')
+			conv_4, 1, 1, name='conv_5')
 
 	return conv_5
 

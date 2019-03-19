@@ -35,6 +35,6 @@ def model(input_tensor):
 			strides=2, activation='relu', name='deconv_5')
 		deconv_6 = tf.layers.conv2d_transpose(
 			deconv_5, 1, filter_size, 
-			strides=2, activation='relu', name='deconv_6')
+			strides=2, name='deconv_6')
 
 	return deconv_6
