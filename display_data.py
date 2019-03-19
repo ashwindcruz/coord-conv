@@ -31,3 +31,8 @@ plt.imshow(image_square_single)
 #plt.figure()
 #plt.imshow(image, cmap=plt.cm.gray)
 #
+
+pc_reshape = np.reshape(image_squares, [56,56,64,64])
+
+bottom_quad = pc_reshape[28:, 28:, :,:]
+
