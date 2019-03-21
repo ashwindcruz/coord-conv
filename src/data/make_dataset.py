@@ -28,9 +28,9 @@ pixel_centers = np.reshape(oneshots, (3136, 64, 64))
 image_squares = np.reshape(images_, (3136, 64, 64))
 
 # Save the data
-if not os.path.exists('../../data'):
-    os.makedirs('../../data')
+if not os.path.exists('../data'):
+    os.makedirs('../data')
 
-np.save('../../data/cartesian_coordinates', cartesian_coordinates)
-np.save('../../data/pixel_centers', pixel_centers)
-np.save('../../data/image_squares', image_squares)
+np.save('../data/cartesian_coordinates', cartesian_coordinates)
+np.save('../data/pixel_centers', pixel_centers)
+np.save('../data/image_squares', image_squares)
