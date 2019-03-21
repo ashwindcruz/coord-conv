@@ -3,7 +3,6 @@
 
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
@@ -35,16 +34,3 @@ if not os.path.exists('../../data'):
 np.save('../../data/cartesian_coordinates', cartesian_coordinates)
 np.save('../../data/pixel_centers', pixel_centers)
 np.save('../../data/image_squares', image_squares)
-
-# Shift this later to the read script
-#shuffled_index = np.random.permutation(3136)
-
-#TODO: Put these as options
-#image = np.repeat(images_[3000], 3, axis=-1)
-#plt.figure()
-#plt.imshow(image, cmap=plt.cm.gray)
-#
-#oneshot_image = np.repeat(oneshots[3000], 3, axis=-1)
-#plt.figure()
-#plt.imshow(oneshot_image)
-
