@@ -41,14 +41,10 @@ tf.set_random_seed(cfg.TF_SEED)
 coordinates_input = tf.placeholder(
     tf.float32, shape=(None, 64, 64, 2), name='coordinates_input')
 
-
 # Set up supervised classification using convolutions with coord convs
 coordinates_input_coord_conv = \
     add_coords.add_coords_layers(coordinates_input)
 output_map = supervised_conv.model_classification(coordinates_input_coord_conv)
-
-# Carry out supervised rendering
-output_map = supervised_conv.model_rendering(output_map)
 
 # Reshaping required for softmax cross entropy
 output_vector = tf.reshape(output_map, [-1, 4096])
@@ -58,8 +54,7 @@ expected_output = tf.placeholder(
     tf.float32, shape=(None, 4096), name='expected_output')
 
 # Calculate the loss
-#training_loss = tf.losses.softmax_cross_entropy(expected_output, output_vector)
-training_loss = tf.losses.sigmoid_cross_entropy(expected_output, output_vector)
+training_loss = tf.losses.softmax_cross_entropy(expected_output, output_vector)
 
 # Set up accuracy calculations
 # This will just be for the test set after training is complete
@@ -67,7 +62,7 @@ acc, acc_op = tf.metrics.accuracy(
     tf.argmax(expected_output, 1), tf.argmax(output_vector, 1))
 
 # Set up the final loss, optimizer, and summaries
-optimizer = tf.contrib.opt.AdamWOptimizer(cfg.WEIGHT_DECAY, cfg.LEARNING_RATE)
+optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
 train_op = optimizer.minimize(training_loss)
 
 init_op = tf.group(
@@ -81,7 +76,7 @@ train_merged_summaries = tf.summary.merge(
     [train_loss_summary], name='train_merged_summaries')
 
 # Set up images for tensorboard
-output_vector_softmax = tf.contrib.layers.softmax(output_vector)
+output_vector_softmax = tf.nn.softmax(output_vector)
 images_output = tf.reshape(output_vector_softmax, [-1, 64, 64, 1])
 images_summary = tf.summary.image('output_images', images_output)
 
@@ -117,14 +112,14 @@ with tf.Session() as sess:
 
             start_index = j * cfg.BATCH_SIZE
             # coord_batch, pixel_batch, _  = read_dataset.get_data(
-            coord_batch, _, image_square_batch = read_dataset.get_data(
+            coord_batch, pixel_batch, _ = read_dataset.get_data(
                 start_index, training_idx, cfg.BATCH_SIZE, 'coordconv')
 
             summaries, _ = sess.run(
                 [train_merged_summaries, train_op],
                 feed_dict={
                     coordinates_input:coord_batch,
-                    expected_output:image_square_batch
+                    expected_output:pixel_batch
                 })
 
             train_writer.add_summary(
@@ -136,7 +131,7 @@ with tf.Session() as sess:
                 training_loss_ = sess.run(
                     training_loss, feed_dict={
                         coordinates_input:coord_batch,
-                        expected_output:image_square_batch
+                        expected_output:pixel_batch
                         }
                     )
                 print('Batch: {:7.1f}, Training Loss: {:12.7f}'.format(
