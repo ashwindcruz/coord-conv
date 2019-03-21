@@ -1,4 +1,4 @@
-# A Neural Algorithm of Artistic Style
+# An intriguing failing of convolutional neural networks and the CoordConv solution
 
 Implementing: Liu, R., Lehman, J., Molino, P., Such, F.P., Frank, E., Sergeev, A. and Yosinski, J., 2018. [An intriguing failing of convolutional neural networks and the coordconv solution](http://papers.nips.cc/paper/8169-an-intriguing-failing-of-convolutional-neural-networks-and-the-coordconv-solution). In Advances in Neural Information Processing Systems (pp. 9628-9639).
 
