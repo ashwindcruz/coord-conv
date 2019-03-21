@@ -6,14 +6,14 @@ Training script for Not-So-Clever Experiments.
 import os
 import shutil
 import sys
-sys.path.insert(0, "C:/Users/Ashwin/Documents/Projects/coord-conv/src")
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
 import config as cfg
+sys.path.insert(0, cfg.DIR_PATH)
+
 import add_coords, supervised_conv, supervised_deconv
 from data import read_dataset
 

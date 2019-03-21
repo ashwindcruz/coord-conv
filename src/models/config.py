@@ -1,3 +1,6 @@
+# Path to folder
+DIR_PATH = 'C:/Users/Ashwin/Documents/Projects/coord-conv/src/'
+
 # Seed for initializing numpy and tf
 NP_SEED = 0
 TF_SEED = 0
@@ -9,7 +12,7 @@ TENSORBOARD_DIR = '../results/tensorboard_logs/'
 DEBUG_DIR = '../results/debug/'
 
 # Type of split to apply to dataset
-SPLIT = 'quadrant'
+SPLIT = 'uniform'
 
 # Dimensions desired for input, channels must be kept as 3
 BATCH_SIZE = 32
