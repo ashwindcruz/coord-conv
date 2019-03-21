@@ -52,7 +52,7 @@ classification_pixel_map = tf.reshape(
     classification_vector_softmax, [-1, 64, 64, 1])
 output_map = supervised_conv.model_rendering(classification_pixel_map)
 
-# Reshaping required for softmax cross entropy
+# Reshaping required for sigmoid cross entropy
 output_vector = tf.reshape(output_map, [-1, 4096])
 
 # Loss placeholder
