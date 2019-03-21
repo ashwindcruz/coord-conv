@@ -45,7 +45,7 @@ coordinates_input = tf.placeholder(
 classification_map = supervised_deconv.model(
     coordinates_input)
 
-# Reshaping required for softmax
+# Reshaping required for sigmoid
 output_vector = tf.reshape(classification_map, [-1, 4096])
 
 # Loss placeholder
