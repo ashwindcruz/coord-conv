@@ -1,6 +1,6 @@
 
 """
-Training script for Not-So-Clever Experiments.
+Training script for Deconvolution Rendering on Not-So-Clevr dataset.
 """
 
 import os
@@ -13,7 +13,7 @@ import tensorflow as tf
 
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
-import add_coords, supervised_conv, supervised_deconv
+import add_coords, supervised_deconv
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -24,12 +24,6 @@ if cfg.RESET_SAVES is True:
     # this directory
     if os.path.exists(cfg.TENSORBOARD_DIR):
         shutil.rmtree(cfg.TENSORBOARD_DIR)
-
-# Create the debug directory if it doesn't exist
-# Tensorboard directory is made automatically if it doesn't exist
-if os.path.exists(cfg.DEBUG_DIR):
-    shutil.rmtree(cfg.DEBUG_DIR)
-os.makedirs(cfg.DEBUG_DIR)
 
 # Set the seeds to provide consistency between runs
 # Can also comment out for variability between runs
