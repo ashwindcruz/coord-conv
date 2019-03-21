@@ -12,9 +12,12 @@ cartesian_coordinates = np.load('data/cartesian_coordinates.npy')
 pixel_centers = np.load('data/pixel_centers.npy')
 image_squares = np.load('data/image_squares.npy')
 
-cartesian_coordinate_single = cartesian_coordinates[0]
-pixel_center_single = np.repeat(pixel_centers[0, :, :, None], 3, axis=-1)
-image_square_single = np.repeat(image_squares[0, :, :, None], 3, axis=-1)
+
+point_to_display = 1000
+
+cartesian_coordinate_single = cartesian_coordinates[point_to_display]
+pixel_center_single = np.repeat(pixel_centers[point_to_display, :, :, None], 3, axis=-1)
+image_square_single = np.repeat(image_squares[point_to_display, :, :, None], 3, axis=-1)
 
 print('Display data for point 0')
 
