@@ -37,7 +37,7 @@ python data/make_dataset.py
 Upon completion, you should see a folder titled ```data``` in the top level of this project. 
 
 ### Path Configuration
-Navigate to the file ```src/models/config.py```.
+Navigate to the file ```models/config.py```.
 At the top of this file is a variable called ```DIR_PATH```.
 Change this to match the directory path to your ```src``` folder. 
 
