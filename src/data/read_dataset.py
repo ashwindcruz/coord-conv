@@ -4,8 +4,6 @@ Unpack the dataset's numpy arrays.
 
 import numpy as np
 
-split = 'uniform'
-
 cartesian_coordinates = \
         np.load('../data/cartesian_coordinates.npy').astype(np.float32)
 pixel_centers = np.load('../data/pixel_centers.npy')
@@ -18,7 +16,7 @@ num_cols = 56
 num_training_examples = 2352
 num_testing_examples = 784
 
-def get_indices(split='uniform'):
+def get_indices(split):
     """
     Get training and testing indices.
 
@@ -45,13 +43,16 @@ def get_indices(split='uniform'):
 
     return training_indices, testing_indices
 
-def get_data(start_index, indices, batch_size):
+def get_data(start_index, indices, batch_size, method=None):
     """
     Fetch data.
 
     Args:
         start_index: Start index of data we want.
         indices: List of complete indices from which we will be selecting.
+        batch_size: Size of the batch of data we want. 
+        method: Can either be 'coordconv' or 'deconv' and this determines
+            the shape of the coordinates array. 
     Returns:
         cartesian_coordinates: xy coordinates of data.
         pixel_centers: Subset of data with pixel centers highlighted.
@@ -64,15 +65,63 @@ def get_data(start_index, indices, batch_size):
     image_squares_batch = image_squares[indices_to_return]
 
     # Edit the dimensionality of the data so it fits properly into placeholders
+    if method == 'coordconv':
+        cartesian_coordinates_batch = get_coordinates_coord_conv(
+            cartesian_coordinates_batch)
+    elif method == 'deconv':
+        cartesian_coordinates_batch = get_coordinates_deconv(
+            cartesian_coordinates_batch)
+
+    pixel_centers_batch = np.reshape(pixel_centers_batch, [batch_size, 4096])
+    image_squares_batch = np.reshape(image_squares_batch, [batch_size, 4096])
+
+    return cartesian_coordinates_batch, pixel_centers_batch, image_squares_batch
+
+def get_coordinates_coord_conv(cartesian_coordinates_batch):
+    """
+    For a given set of coordinate arrays, shape it so that it is suitable for 
+    the models using coordconv. 
+
+    Args:
+        cartesian_coordinates_batch: Arrays containing the cartesian coordinates. 
+    Returns:
+        cartesian_coordinates_batch: Similar to the input namesake but tiled so 
+            that the shape is [batch_size, 64, 64, 2]
+    """
     cartesian_coordinates_batch = np.expand_dims(
-            cartesian_coordinates_batch, axis=1)
+        cartesian_coordinates_batch, axis=1)
     cartesian_coordinates_batch = np.repeat(
         cartesian_coordinates_batch, 64*64, axis=1)
     cartesian_coordinates_batch = np.reshape(
-        cartesian_coordinates_batch, [batch_size, 64, 64, 2])
-    pixel_centers_batch = np.expand_dims(pixel_centers_batch, axis=-1)
-    pixel_centers_batch = np.reshape(pixel_centers_batch, [batch_size, 4096])
-    image_squares_batch = np.expand_dims(image_squares_batch, axis=-1)
+        cartesian_coordinates_batch, [-1, 64, 64, 2])
 
-    return cartesian_coordinates_batch, pixel_centers_batch, image_squares_batch
+    return cartesian_coordinates_batch
+
+def get_coordinates_deconv(cartesian_coordinates_batch):
+    """
+    For a given set of coordinate arrays, shape it so that it is suitable for 
+    the models using deconvolutions. 
+
+    Args:
+        cartesian_coordinates_batch: Arrays containing the cartesian coordinates. 
+    Returns:
+        cartesian_coordinates_batch: Similar to the input namesake but tiled so 
+            that the shape is [batch_size, 1, 1, 2]
+    """
+    cartesian_coordinates_batch = np.expand_dims(
+        cartesian_coordinates_batch, axis=1)
+    cartesian_coordinates_batch = np.expand_dims(
+        cartesian_coordinates_batch, axis=1)
+    
+    return cartesian_coordinates_batch
+
+
+
+
+
+
+
+
+
+
 
