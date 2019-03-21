@@ -44,7 +44,7 @@ def model_rendering(input_tensor):
 	# Specify the filter size and number of channels
 	filter_size = 2
 	channels = 2
-
+	
 	with tf.variable_scope('conv_model_rendering', reuse=tf.AUTO_REUSE):
 		conv_1 = tf.layers.conv2d(
 			input_tensor, 8*channels, filter_size, 
@@ -60,6 +60,6 @@ def model_rendering(input_tensor):
 			padding='same', activation='relu', name='conv_4')
 		conv_5 = tf.layers.conv2d(
 			conv_4, 1, filter_size,
-			padding='same', activation='relu', name='conv_5')
+			padding='same', name='conv_5')
 		
 	return conv_5

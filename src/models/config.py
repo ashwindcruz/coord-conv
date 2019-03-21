@@ -1,8 +1,3 @@
-# Path to images uused during training and validation
-STYLE_IMAGE_PATH = './images/starry_night.jpg'
-TRAIN_IMAGES_DIR = './train2014/train2014/'
-VAL_IMAGES_DIR = './val2014/val2014/'
-
 # Seed for initializing numpy and tf
 NP_SEED = 0
 TF_SEED = 0
@@ -13,16 +8,20 @@ TENSORBOARD_DIR = '../results/tensorboard_logs/'
 # Path to directory used for storing images
 DEBUG_DIR = '../results/debug/'
 
+# Type of split to apply to dataset
+SPLIT = 'quadrant'
+
 # Dimensions desired for input, channels must be kept as 3
 BATCH_SIZE = 32
 
 # Learning rate for optimizer
 LEARNING_RATE = 1e-3
+WEIGHT_DECAY = 1e-3
 
 # Number of training and validation step
 # In this instance, validation refers to when we would like to examine:
 # save currently optimized image and loss
-TRAINING_EPOCHS = 200
+TRAINING_EPOCHS = 150
 TENSORBOARD_STEPS = 10
 
 # Offline debugging refers to images that will be saved to folder using plt,

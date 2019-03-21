@@ -14,7 +14,7 @@ def model(input_tensor):
 
 	# Specify the filter size and number of channels
 	filter_size = 2
-	channels = 2
+	channels = 3
 
 
 	with tf.variable_scope('deconv_model', reuse=tf.AUTO_REUSE):
@@ -34,7 +34,6 @@ def model(input_tensor):
 			deconv_4, 32*channels, filter_size, 
 			strides=2, activation='relu', name='deconv_5')
 		deconv_6 = tf.layers.conv2d_transpose(
-			deconv_5, 1, filter_size, 
-			strides=2, name='deconv_6')
+			deconv_5, 1, filter_size, strides=2, name='deconv_6')
 
 	return deconv_6
