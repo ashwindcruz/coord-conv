@@ -21,7 +21,7 @@ WEIGHT_DECAY = 1e-3
 # Number of training and validation step
 # In this instance, validation refers to when we would like to examine:
 # save currently optimized image and loss
-TRAINING_EPOCHS = 150
+TRAINING_EPOCHS = 100
 TENSORBOARD_STEPS = 10
 
 # Offline debugging refers to images that will be saved to folder using plt,
@@ -34,13 +34,3 @@ DISPLAY_STEPS = 10
 # Determines whether information is saved between runs
 # for tensorboard
 RESET_SAVES = True
-
-### OVERFITTING MODE
-# In this mode, we train on a smaller batch of data, treat that set as the 
-# validation data, since it's unlikely the network will generalize, and 
-# we also view information more frequently
-OVERFITTING_MODE = False
-if OVERFITTING_MODE:
-	TRAINING_EPOCHS = 500
-	VALIDATION_STEPS = 50
-	DISPLAY_STEPS = 1
