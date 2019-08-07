@@ -38,7 +38,9 @@ pixel_input = tf.placeholder(
 # Set up supervised regression using convolutions
 if cfg.SPLIT == 'uniform':
     output_map = supervised_deconv.model_regression_uniform(pixel_input)
-import pdb; pdb.set_trace() 
+else:
+    output_map = supervised_deconv.model_regression_quadrant(
+        pixel_input, True)
 # Reshaping required for softmax cross entropy
 #output_vector = tf.reshape(output_map, [-1, 4096])
 output_vector = output_map
@@ -55,7 +57,7 @@ optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
 train_op = optimizer.minimize(training_loss)
 
 init_op = tf.group(
-    tf.global_variables_initializer(), 
+    tf.global_variables_initializer(),
     tf.local_variables_initializer(),
     name='initialize_all')
 
@@ -92,7 +94,7 @@ with tf.Session() as sess:
             start_index = j * cfg.BATCH_SIZE
             coord_batch, pixel_batch, _ = read_dataset.get_data(
                 start_index, training_idx, cfg.BATCH_SIZE, 'regression')
-            
+
             summaries, _ = sess.run(
                 [train_merged_summaries, train_op],
                 feed_dict={
@@ -102,7 +104,7 @@ with tf.Session() as sess:
 
             train_writer.add_summary(
                 summaries, training_step)
-            
+
             # Print losses to screen
             if training_step % cfg.DISPLAY_STEPS == 0:
                 training_loss_ = sess.run(
@@ -117,7 +119,7 @@ with tf.Session() as sess:
 
             training_step += 1
 
-            
+
         print('Epoch {} done'.format(i+1))
 
     # After training, calculate the accuracy on the test set
