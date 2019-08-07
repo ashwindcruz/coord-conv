@@ -12,14 +12,14 @@ TENSORBOARD_DIR = '../results/tensorboard_logs/'
 DEBUG_DIR = '../results/debug/'
 
 # Type of split to apply to dataset
-SPLIT = 'uniform'
+SPLIT = 'quadrant'
 
 # Dimensions desired for input, channels must be kept as 3
 BATCH_SIZE = 32
 
 # Learning rate for optimizer
-LEARNING_RATE = 1e-3
-WEIGHT_DECAY = 1e-3
+LEARNING_RATE = 5e-4#1e-3
+WEIGHT_DECAY = 5e-4#1e-3
 
 # Number of training and validation step
 # In this instance, validation refers to when we would like to examine:
