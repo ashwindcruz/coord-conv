@@ -7,7 +7,7 @@ def model(input_tensor):
 	Use deconvolutions (aka transposed convolutions) to achieve this. 
 
 	Args:
-		input_tensor: Tensor representation of a pixel coordinate. 
+		input_tensor: Tensor representation of a Cartesian pixel coordinate. 
 	Returns:
 		pixel_map: 64x64 grid highligting the pixel specified in the input. 
 	"""
