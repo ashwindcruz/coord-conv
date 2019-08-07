@@ -5,7 +5,7 @@ def add_coords_layers(input_tensor):
 	For a given tensor, add additional layers specifying the xy coordinates. 
 
 	Args:
-		input_tensor: An input tensor not containining coordinate layers. 
+		input_tensor: An input tensor not containing coordinate layers. 
 	Returns:
 		output_tensor: Similar to input tensor but with two additional layers
 			specifying xy coordinates. 
