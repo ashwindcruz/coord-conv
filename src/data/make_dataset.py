@@ -8,10 +8,10 @@ import tensorflow as tf
 
 
 # Create the one-hot images and square images
-oneshots = np.pad(
+onehots = np.pad(
             np.eye(3136).reshape((3136, 56, 56, 1)),
             ((0,0), (4,4), (4,4), (0,0)), 'constant')
-images = tf.nn.conv2d(oneshots, np.ones((9, 9, 1, 1)), [1]*4, 'SAME')
+images = tf.nn.conv2d(onehots, np.ones((9, 9, 1, 1)), [1]*4, 'SAME')
 sess = tf.Session()
 images_ = sess.run(images)
 
@@ -24,7 +24,7 @@ col_inds = np.reshape(col_inds, [3136])
 
 # Create the 3 fields of the datasets
 cartesian_coordinates = np.stack((row_inds, col_inds), axis=-1)
-pixel_centers = np.reshape(oneshots, (3136, 64, 64))
+pixel_centers = np.reshape(onehots, (3136, 64, 64))
 image_squares = np.reshape(images_, (3136, 64, 64))
 
 # Save the data
