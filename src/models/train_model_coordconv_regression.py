@@ -33,15 +33,13 @@ tf.set_random_seed(cfg.TF_SEED)
 
 # Coordinates placeholder
 pixel_input = tf.placeholder(
-    tf.float32, shape=(None, 64, 64, 2), name='pixel_input')
+    tf.float32, shape=(None, 64, 64, 1), name='pixel_input')
 
 # Set up supervised regression using convolutions with coord convs
 pixel_input_coord_conv = \
     add_coords.add_coords_layers(pixel_input)
-output_map = supervised_conv.model_regression(pixel_input_coord_conv)
+output_map, conv_5 = supervised_conv.model_regression(pixel_input_coord_conv)
 
-# Reshaping required for softmax cross entropy
-#output_vector = tf.reshape(output_map, [-1, 4096])
 output_vector = output_map
 
 # Loss placeholder
@@ -49,7 +47,14 @@ expected_output = tf.placeholder(
     tf.float32, shape=(None, 2), name='expected_output')
 
 # Calculate the loss
-training_loss = tf.losses.mean_squared_error(expected_output, output_vector)
+training_loss_sq = tf.square(expected_output-output_vector)
+training_loss = tf.reduce_mean(training_loss_sq)
+#training_loss = tf.losses.mean_squared_error(
+#    expected_output, output_vector)
+
+# Set up accuracy calculations
+# This will just be for the test set after training is complete
+acc, acc_op = tf.metrics.accuracy(expected_output, output_vector)
 
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
@@ -93,13 +98,16 @@ with tf.Session() as sess:
             start_index = j * cfg.BATCH_SIZE
             coord_batch, pixel_batch, _ = read_dataset.get_data(
                 start_index, training_idx, cfg.BATCH_SIZE, 'regression')
+
             
-            summaries, _ = sess.run(
-                [train_merged_summaries, train_op],
+            output_vector_, training_loss_sq_, summaries, _ = sess.run(
+                [output_vector, training_loss_sq, train_merged_summaries, train_op],
                 feed_dict={
                     pixel_input:pixel_batch,
                     expected_output:coord_batch
                 })
+            if j == 50:
+                import pdb; pdb.set_trace()
 
             train_writer.add_summary(
                 summaries, training_step)
@@ -121,19 +129,21 @@ with tf.Session() as sess:
             
         print('Epoch {} done'.format(i+1))
 
-    # After training, calculate the accuracy on the test set
-    # total_accuracy = 0
-    # for i in range(num_test_batches):
-    #     start_index = i * cfg.BATCH_SIZE
-    #     coord_batch, pixel_batch, _ = read_dataset.get_data(
-    #         start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
+    #After training, calculate the accuracy on the test set
+    total_accuracy = 0
+    for i in range(num_test_batches):
+        start_index = i * cfg.BATCH_SIZE
+        coord_batch, pixel_batch, _ = read_dataset.get_data(
+            start_index, training_idx, cfg.BATCH_SIZE, 'regression')
 
-    #     acc_op_ = sess.run(
-    #         acc_op,
-    #         feed_dict={
-    #             coordinates_input:coord_batch, expected_output:pixel_batch}
-    #         )
+        acc_, acc_op_ = sess.run(
+            [acc, acc_op],
+            feed_dict={
+                pixel_input:pixel_batch, expected_output:coord_batch}
+            )
+        print(acc_)
 
-    # total_accuracy = sess.run(acc)
 
-    # print('Test set accuracy: {}'.format(total_accuracy*100))
+    total_accuracy = sess.run(acc)
+
+    print('Test set accuracy: {}'.format(total_accuracy*100))

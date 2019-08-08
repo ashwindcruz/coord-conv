@@ -78,6 +78,7 @@ def model_regression(input_tensor):
 	"""
 
 	with tf.variable_scope('conv_model_regression', reuse=tf.AUTO_REUSE):
+
 		conv_1 = tf.layers.conv2d(
 			input_tensor, 8, 1, activation='relu', name='conv_1')
 		conv_2 = tf.layers.conv2d(
@@ -87,8 +88,8 @@ def model_regression(input_tensor):
 		conv_4 = tf.layers.conv2d(
 			conv_3, 8, 3, activation='relu', name='conv_4')
 		conv_5 = tf.layers.conv2d(
-			conv_4, 2, 3, activation='relu', name='conv_5')
+			conv_4, 2, 3, activation=None, name='conv_5')
 		global_pooling_1 = tf.reduce_mean(
 			conv_5, axis=[1,2], name='global_pooling_1')
-		
-	return global_pooling_1
+	
+	return global_pooling_1, conv_5
