@@ -15,11 +15,11 @@ DEBUG_DIR = '../results/debug/'
 SPLIT = 'uniform'
 
 # Dimensions desired for input, channels must be kept as 3
-BATCH_SIZE = 32
+BATCH_SIZE = 30
 
 # Learning rate for optimizer
-LEARNING_RATE = 5e-4#1e-3
-WEIGHT_DECAY = 5e-4#1e-3
+LEARNING_RATE = 1e-4
+WEIGHT_DECAY = 1e-4
 
 # Number of training and validation step
 # In this instance, validation refers to when we would like to examine:
