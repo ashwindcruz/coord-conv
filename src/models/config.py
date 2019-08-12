@@ -18,8 +18,8 @@ SPLIT = 'uniform'
 BATCH_SIZE = 30
 
 # Learning rate for optimizer
-LEARNING_RATE = 1e-4
-WEIGHT_DECAY = 1e-4
+LEARNING_RATE = 1e-2
+WEIGHT_DECAY = 1e-2
 
 # Number of training and validation step
 # In this instance, validation refers to when we would like to examine:
