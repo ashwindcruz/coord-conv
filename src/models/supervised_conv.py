@@ -76,25 +76,20 @@ def model_regression(input_tensor):
 	Returns:
 		coordinates: Pair of coordinates marking the pixel specified in the input.
 	"""
-
+	activation = None
 	with tf.variable_scope('conv_model_regression', reuse=tf.AUTO_REUSE):
 
 		conv_1 = tf.layers.conv2d(
-			input_tensor, 8, 1,  name='conv_1')
+			input_tensor, 8, 1, activation=activation, name='conv_1')
 		conv_2 = tf.layers.conv2d(
-			conv_1, 8, 1,  name='conv_2')
+			conv_1, 8, 1, activation=activation, name='conv_2')
 		conv_3 = tf.layers.conv2d(
-			conv_2, 8, 1,  name='conv_3')
+			conv_2, 8, 1, activation=activation, name='conv_3')
 		conv_4 = tf.layers.conv2d(
-			conv_3, 8, 3,  name='conv_4')
+			conv_3, 8, 3, activation=activation, name='conv_4')
 		conv_5 = tf.layers.conv2d(
 			conv_4, 2, 3, activation=None, name='conv_5')
-                conv_5 = tf.layers.conv2d(
-			conv_4, 2, 3, activation=None, name='conv_5')
-
-                max_pooling_1 = tf.compat.v1.layers.max_pooling2d(conv_5, pool_size=64, strides=64)
-		#global_pooling_1 = tf.reduce_mean(
-	#		conv_5, axis=[1,2], name='global_pooling_1')
-
-
+		max_pooling_1 = tf.compat.v1.layers.max_pooling2d(conv_5, pool_size=60, strides=60, padding='valid')
+		max_pooling_1 = tf.squeeze(max_pooling_1)
+		
 	return max_pooling_1
