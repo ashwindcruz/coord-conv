@@ -28,8 +28,8 @@ if cfg.RESET_SAVES is True:
 
 # Set the seeds to provide consistency between runs
 # Can also comment out for variability between runs
-#np.random.seed(cfg.NP_SEED)
-#tf.set_random_seed(cfg.TF_SEED)
+np.random.seed(cfg.NP_SEED)
+tf.set_random_seed(cfg.TF_SEED)
 
 # Coordinates placeholder
 pixel_input = tf.placeholder(
@@ -45,8 +45,10 @@ expected_output = tf.placeholder(
     tf.float32, shape=(None, 2), name='expected_output')
 
 # Calculate the loss
-training_loss = tf.square(expected_output-output_vector)
-training_loss_scalar = tf.reduce_mean(training_loss)
+#training_loss = tf.square(expected_output-output_vector)
+#training_loss_scalar = tf.reduce_mean(training_loss)
+training_loss = tf.losses.mean_squared_error(
+    expected_output, output_vector)
 
 # Set up accuracy calculations
 # This will just be for the test set after training is complete
@@ -54,7 +56,7 @@ acc, acc_op = tf.metrics.accuracy(expected_output, output_vector)
 
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
-train_op = optimizer.minimize(training_loss_scalar)
+train_op = optimizer.minimize(training_loss)
 
 init_op = tf.group(
     tf.global_variables_initializer(),
@@ -62,7 +64,7 @@ init_op = tf.group(
     name='initialize_all')
 
 # Tensorboard summaries
-train_loss_summary = tf.summary.scalar('train_loss', training_loss_scalar)
+train_loss_summary = tf.summary.scalar('train_loss', training_loss)
 train_merged_summaries = tf.summary.merge(
     [train_loss_summary], name='train_merged_summaries')
 
@@ -88,6 +90,7 @@ with tf.Session() as sess:
         # Shuffle the training indices for every epoch
         training_idx = np.random.permutation(training_idx)
         # Go through one pass of the training data
+         
         for j in range(num_train_batches):
 
 
@@ -102,8 +105,7 @@ with tf.Session() as sess:
                     pixel_input:pixel_batch,
                     expected_output:coord_batch
                 })
-            if j == 50:
-                import pdb; pdb.set_trace()
+           
 
             train_writer.add_summary(
                 summaries, training_step)
@@ -111,7 +113,7 @@ with tf.Session() as sess:
             # Print losses to screen
             if training_step % cfg.DISPLAY_STEPS == 0:
                 training_loss_ = sess.run(
-                    training_loss_scalar, feed_dict={
+                    training_loss, feed_dict={
                         pixel_input:pixel_batch,
                         expected_output:coord_batch
                         }
