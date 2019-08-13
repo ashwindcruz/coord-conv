@@ -14,7 +14,7 @@ import tensorflow as tf
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
 
-import add_coords, supervised_conv
+import add_coords, coordconv_models
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -38,7 +38,7 @@ coordinates_input = tf.placeholder(
 # Set up supervised classification using convolutions with coord convs
 coordinates_input_coord_conv = \
     add_coords.add_coords_layers(coordinates_input)
-output_map = supervised_conv.model_classification(coordinates_input_coord_conv)
+output_map = coordconv_models.model_classification(coordinates_input_coord_conv)
 
 # Reshaping required for softmax cross entropy
 output_vector = tf.reshape(output_map, [-1, 4096])
@@ -120,7 +120,7 @@ with tf.Session() as sess:
 
             train_writer.add_summary(
                 summaries, training_step)
-            
+
 
             # Print losses to screen
             if training_step % cfg.DISPLAY_STEPS == 0:
@@ -137,7 +137,7 @@ with tf.Session() as sess:
             # Save image summary to tensorboard
             if training_step % cfg.TENSORBOARD_STEPS == 0:
                 images_summary_ = sess.run(
-                    images_summary, 
+                    images_summary,
                     feed_dict={coordinates_input:tensorboard_batch}
                     )
 

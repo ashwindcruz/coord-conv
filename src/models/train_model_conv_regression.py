@@ -14,7 +14,7 @@ import tensorflow as tf
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
 
-import add_coords, supervised_deconv
+import add_coords, non_coordconv_models
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -35,15 +35,12 @@ tf.set_random_seed(cfg.TF_SEED)
 pixel_input = tf.placeholder(
     tf.float32, shape=(None, 64, 64, 1), name='pixel_input')
 
-# Set up supervised regression using convolutions
+# Choose the architecture based on the data split being used
 if cfg.SPLIT == 'uniform':
-    output_map = supervised_deconv.model_regression_uniform(pixel_input)
-else:
-    output_map = supervised_deconv.model_regression_quadrant(pixel_input, True)
-
-# Reshaping required for softmax cross entropy
-#output_vector = tf.reshape(output_map, [-1, 4096])
-output_vector = output_map
+    output_vector = non_coordconv_models.model_regression_uniform(pixel_input)
+elif cfg.SPLIT == 'quadrant':
+    output_vector = non_coordconv_models.model_regression_quadrant(
+        pixel_input, True)
 
 # Loss placeholder
 expected_output = tf.placeholder(
@@ -96,7 +93,6 @@ with tf.Session() as sess:
         # Go through one pass of the training data
         for j in range(num_train_batches):
 
-
             start_index = j * cfg.BATCH_SIZE
             coord_batch, pixel_batch, _ = read_dataset.get_data(
                 start_index, training_idx, cfg.BATCH_SIZE, 'regression')
@@ -125,7 +121,6 @@ with tf.Session() as sess:
 
             training_step += 1
 
-
         print('Epoch {} done'.format(i+1))
 
     # After training, calculate the accuracy on the entire training set
@@ -135,7 +130,7 @@ with tf.Session() as sess:
             start_index, training_idx, cfg.BATCH_SIZE, 'regression')
 
         train_acc_op_ = sess.run(
-            train_acc_op,  
+            train_acc_op,
             feed_dict={
                 pixel_input:pixel_batch, expected_output:coord_batch}
             )
@@ -144,7 +139,6 @@ with tf.Session() as sess:
 
     print('Train set accuracy: {}'.format(total_accuracy*100))
 
-
     # After training, calculate the accuracy on the test set
     for i in range(num_test_batches):
         start_index = i * cfg.BATCH_SIZE
@@ -152,7 +146,7 @@ with tf.Session() as sess:
             start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
 
         test_acc_op_ = sess.run(
-            test_acc_op,  
+            test_acc_op,
             feed_dict={
                 pixel_input:pixel_batch, expected_output:coord_batch}
             )

@@ -14,7 +14,7 @@ import tensorflow as tf
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
 
-import add_coords, supervised_conv
+import add_coords, coordconv_models
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -38,7 +38,7 @@ pixel_input = tf.placeholder(
 # Set up supervised regression using convolutions with coord convs
 pixel_input_coord_conv = \
     add_coords.add_coords_layers(pixel_input)
-output_vector = supervised_conv.model_regression(pixel_input_coord_conv)
+output_vector = coordconv_models.model_regression(pixel_input_coord_conv)
 
 # Loss placeholder
 expected_output = tf.placeholder(
@@ -90,7 +90,7 @@ with tf.Session() as sess:
     for i in range(cfg.TRAINING_EPOCHS):
         # Shuffle the training indices for every epoch
         training_idx = np.random.permutation(training_idx)
-        # Go through one pass of the training data 
+        # Go through one pass of the training data
         for j in range(num_train_batches):
 
 
@@ -105,7 +105,7 @@ with tf.Session() as sess:
                     pixel_input:pixel_batch,
                     expected_output:coord_batch
                 })
-           
+
 
             train_writer.add_summary(
                 summaries, training_step)
@@ -134,7 +134,7 @@ with tf.Session() as sess:
             start_index, training_idx, cfg.BATCH_SIZE, 'regression')
 
         train_acc_op_ = sess.run(
-            train_acc_op,  
+            train_acc_op,
             feed_dict={
                 pixel_input:pixel_batch, expected_output:coord_batch}
             )
@@ -152,7 +152,7 @@ with tf.Session() as sess:
             start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
 
         test_acc_op_ = sess.run(
-            test_acc_op,  
+            test_acc_op,
             feed_dict={
                 pixel_input:pixel_batch, expected_output:coord_batch}
             )

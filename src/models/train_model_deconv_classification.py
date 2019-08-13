@@ -1,4 +1,3 @@
-
 """
 Training script for Deconvolution Classification on Not-So-Clevr dataset.
 """
@@ -13,7 +12,7 @@ import tensorflow as tf
 
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
-import add_coords, supervised_deconv
+import add_coords, non_coordconv_models
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -35,7 +34,7 @@ coordinates_input = tf.placeholder(
     tf.float32, shape=(None, 1, 1, 2), name='coordinates_input')
 
 # Carry out the rendering
-classification_map = supervised_deconv.model(
+classification_map = non_coordconv_models.model_classification(
     coordinates_input)
 
 # Reshaping required for softmax
@@ -122,7 +121,7 @@ with tf.Session() as sess:
 
             train_writer.add_summary(
                 summaries, training_step)
-            
+
 
             # Print losses to screen
             if training_step % cfg.DISPLAY_STEPS == 0:
@@ -139,7 +138,7 @@ with tf.Session() as sess:
             # Save image summary to tensorboard
             if training_step % cfg.TENSORBOARD_STEPS == 0:
                 images_summary_ = sess.run(
-                    images_summary, 
+                    images_summary,
                     feed_dict={coordinates_input:tensorboard_batch}
                     )
 

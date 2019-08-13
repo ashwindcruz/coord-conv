@@ -13,7 +13,7 @@ import tensorflow as tf
 
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
-import add_coords, supervised_conv
+import add_coords, coordconv_models
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -37,13 +37,7 @@ coordinates_input = tf.placeholder(
 # Carry out the rendering
 coordinates_input_coord_conv = \
     add_coords.add_coords_layers(coordinates_input)
-classification_map = supervised_conv.model_classification(
-    coordinates_input_coord_conv)
-classification_vector = tf.reshape(classification_map, [-1, 4096])
-classification_vector_softmax = tf.contrib.layers.softmax(classification_vector)
-classification_pixel_map = tf.reshape(
-    classification_vector_softmax, [-1, 64, 64, 1])
-output_map = supervised_conv.model_rendering(classification_pixel_map)
+output_map = coordconv_models.model_rendering(coordinates_input_coord_conv)
 
 # Reshaping required for sigmoid cross entropy
 output_vector = tf.reshape(output_map, [-1, 4096])
@@ -58,9 +52,9 @@ training_loss = tf.losses.sigmoid_cross_entropy(expected_output, output_vector)
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
 train_op = optimizer.minimize(training_loss)
-    
+
 init_op = tf.group(
-    tf.global_variables_initializer(), 
+    tf.global_variables_initializer(),
     tf.local_variables_initializer(),
     name='initialize_all')
 
@@ -127,7 +121,7 @@ with tf.Session() as sess:
 
             train_writer.add_summary(
                 summaries, training_step)
-            
+
 
             # Print losses to screen
             if training_step % cfg.DISPLAY_STEPS == 0:
@@ -144,7 +138,7 @@ with tf.Session() as sess:
             # Save image summary to tensorboard
             if training_step % cfg.TENSORBOARD_STEPS == 0:
                 images_summary_ = sess.run(
-                    images_summary, 
+                    images_summary,
                     feed_dict={coordinates_input:tensorboard_batch}
                     )
 
@@ -152,12 +146,12 @@ with tf.Session() as sess:
 
             training_step += 1
 
-            
+
         print('Epoch {} done'.format(i+1))
 
     # After training is done, check how well the model renders test images
     images_summary_ = sess.run(
-                    images_test_summary, 
+                    images_test_summary,
                     feed_dict={coordinates_input:tensorboard_test_batch}
                     )
 

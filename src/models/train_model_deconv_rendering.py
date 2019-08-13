@@ -13,7 +13,7 @@ import tensorflow as tf
 
 import config as cfg
 sys.path.insert(0, cfg.DIR_PATH)
-import add_coords, supervised_deconv
+import add_coords, non_coordconv_models
 from data import read_dataset
 
 # Set TF debugging to only show errors
@@ -35,7 +35,7 @@ coordinates_input = tf.placeholder(
     tf.float32, shape=(None, 1, 1, 2), name='coordinates_input')
 
 # Carry out the rendering
-classification_map = supervised_deconv.model(
+classification_map = non_coordconv_models.model_classification(
     coordinates_input)
 
 # Reshaping required for sigmoid
@@ -51,9 +51,9 @@ training_loss = tf.losses.sigmoid_cross_entropy(expected_output, output_vector)
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.contrib.opt.AdamWOptimizer(cfg.WEIGHT_DECAY, cfg.LEARNING_RATE)
 train_op = optimizer.minimize(training_loss)
-    
+
 init_op = tf.group(
-    tf.global_variables_initializer(), 
+    tf.global_variables_initializer(),
     tf.local_variables_initializer(),
     name='initialize_all')
 
@@ -120,7 +120,7 @@ with tf.Session() as sess:
 
             train_writer.add_summary(
                 summaries, training_step)
-            
+
 
             # Print losses to screen
             if training_step % cfg.DISPLAY_STEPS == 0:
@@ -137,7 +137,7 @@ with tf.Session() as sess:
             # Save image summary to tensorboard
             if training_step % cfg.TENSORBOARD_STEPS == 0:
                 images_summary_ = sess.run(
-                    images_summary, 
+                    images_summary,
                     feed_dict={coordinates_input:tensorboard_batch}
                     )
 
@@ -145,14 +145,14 @@ with tf.Session() as sess:
 
             training_step += 1
 
-            
+
         print('Epoch {} done'.format(i+1))
 
     # After training is done, check how well the model renders test images
     images_summary_ = sess.run(
-                    images_test_summary, 
+                    images_test_summary,
                     feed_dict={coordinates_input:tensorboard_test_batch}
                     )
 
     train_writer.add_summary(images_summary_, training_step)
-    
+
