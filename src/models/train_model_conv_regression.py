@@ -33,14 +33,14 @@ tf.set_random_seed(cfg.TF_SEED)
 
 # Coordinates placeholder
 pixel_input = tf.placeholder(
-    tf.float32, shape=(None, 64, 64, 2), name='pixel_input')
+    tf.float32, shape=(None, 64, 64, 1), name='pixel_input')
 
 # Set up supervised regression using convolutions
 if cfg.SPLIT == 'uniform':
     output_map = supervised_deconv.model_regression_uniform(pixel_input)
 else:
-    output_map = supervised_deconv.model_regression_quadrant(
-        pixel_input, True)
+    output_map = supervised_deconv.model_regression_quadrant(pixel_input, True)
+
 # Reshaping required for softmax cross entropy
 #output_vector = tf.reshape(output_map, [-1, 4096])
 output_vector = output_map
