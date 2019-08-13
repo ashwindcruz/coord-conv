@@ -45,14 +45,15 @@ expected_output = tf.placeholder(
     tf.float32, shape=(None, 2), name='expected_output')
 
 # Calculate the loss
-#training_loss = tf.square(expected_output-output_vector)
-#training_loss_scalar = tf.reduce_mean(training_loss)
 training_loss = tf.losses.mean_squared_error(
     expected_output, output_vector)
 
 # Set up accuracy calculations
-# This will just be for the test set after training is complete
-acc, acc_op = tf.metrics.accuracy(expected_output, output_vector)
+train_acc, train_acc_op = tf.metrics.accuracy(
+    expected_output, tf.round(output_vector))
+test_acc, test_acc_op = tf.metrics.accuracy(
+    expected_output, tf.round(output_vector))
+
 
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
@@ -89,8 +90,7 @@ with tf.Session() as sess:
     for i in range(cfg.TRAINING_EPOCHS):
         # Shuffle the training indices for every epoch
         training_idx = np.random.permutation(training_idx)
-        # Go through one pass of the training data
-         
+        # Go through one pass of the training data 
         for j in range(num_train_batches):
 
 
@@ -126,4 +126,38 @@ with tf.Session() as sess:
 
 
         print('Epoch {} done'.format(i+1))
+
+    # After training, calculate the accuracy on the entire training set
+    for i in range(num_train_batches):
+        start_index = i * cfg.BATCH_SIZE
+        coord_batch, pixel_batch, _ = read_dataset.get_data(
+            start_index, training_idx, cfg.BATCH_SIZE, 'regression')
+
+        train_acc_op_ = sess.run(
+            train_acc_op,  
+            feed_dict={
+                pixel_input:pixel_batch, expected_output:coord_batch}
+            )
+
+    total_accuracy = sess.run(train_acc)
+
+    print('Train set accuracy: {}'.format(total_accuracy*100))
+
+
+
+    # After training, calculate the accuracy on the test set
+    for i in range(num_test_batches):
+        start_index = i * cfg.BATCH_SIZE
+        coord_batch, pixel_batch, _ = read_dataset.get_data(
+            start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
+
+        test_acc_op_ = sess.run(
+            test_acc_op,  
+            feed_dict={
+                pixel_input:pixel_batch, expected_output:coord_batch}
+            )
+
+    total_accuracy = sess.run(test_acc)
+
+    print('Test set accuracy: {}'.format(total_accuracy*100))
 
