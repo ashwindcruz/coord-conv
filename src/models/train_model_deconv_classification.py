@@ -49,16 +49,18 @@ expected_output = tf.placeholder(
 training_loss = tf.losses.softmax_cross_entropy(expected_output, output_vector)
 
 # Set up accuracy calculations
-# This will just be for the test set after training is complete
-acc, acc_op = tf.metrics.accuracy(
-    tf.argmax(expected_output, 1), tf.argmax(output_vector, 1))
+train_acc, train_acc_op = tf.metrics.accuracy(
+    expected_output, tf.round(output_vector))
+test_acc, test_acc_op = tf.metrics.accuracy(
+    expected_output, tf.round(output_vector))
+
 
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
 train_op = optimizer.minimize(training_loss)
-    
+
 init_op = tf.group(
-    tf.global_variables_initializer(), 
+    tf.global_variables_initializer(),
     tf.local_variables_initializer(),
     name='initialize_all')
 
@@ -145,22 +147,37 @@ with tf.Session() as sess:
 
             training_step += 1
 
-            
+
         print('Epoch {} done'.format(i+1))
 
-    # After training, calculate the accuracy on the test set
-    total_accuracy = 0
-    for i in range(num_test_batches):
+    # After training, calculate the accuracy on the entire training set
+    for i in range(num_train_batches):
         start_index = i * cfg.BATCH_SIZE
         coord_batch, pixel_batch, _ = read_dataset.get_data(
-            start_index, testing_idx, cfg.BATCH_SIZE, 'deconv')
+            start_index, training_idx, cfg.BATCH_SIZE, 'regression')
 
-        acc_op_ = sess.run(
-            acc_op,
+        train_acc_op_ = sess.run(
+            train_acc_op,
             feed_dict={
                 coordinates_input:coord_batch, expected_output:pixel_batch}
             )
 
-    total_accuracy = sess.run(acc)
+    total_accuracy = sess.run(train_acc)
+
+    print('Train set accuracy: {}'.format(total_accuracy*100))
+
+    # After training, calculate the accuracy on the test set
+    for i in range(num_test_batches):
+        start_index = i * cfg.BATCH_SIZE
+        coord_batch, pixel_batch, _ = read_dataset.get_data(
+            start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
+
+        test_acc_op_ = sess.run(
+            test_acc_op,
+            feed_dict={
+                coordinates_input:coord_batch, expected_output:pixel_batch}
+            )
+
+    total_accuracy = sess.run(test_acc)
 
     print('Test set accuracy: {}'.format(total_accuracy*100))
