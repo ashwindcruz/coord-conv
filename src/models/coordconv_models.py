@@ -46,8 +46,17 @@ def model_rendering(input_tensor):
 	channels = 2
 
 	with tf.variable_scope('conv_model_rendering', reuse=tf.AUTO_REUSE):
+
+                classification_output = model_classification(input_tensor)
+                classification_vector = tf.reshape(
+                        classification_output, [-1, 4096])
+                classification_vector_softmax = tf.contrib.layers.softmax(
+                        classification_vector)
+                classification_pixel_map = tf.reshape(
+                        classification_vector_softmax, [-1, 64, 64, 1])
+
 		conv_1 = tf.layers.conv2d(
-			input_tensor, 8*channels, filter_size,
+			classification_pixel_map, 8*channels, filter_size,
 			padding='same', activation='relu', name='conv_1')
 		conv_2 = tf.layers.conv2d(
 			conv_1, 8*channels, filter_size,
@@ -91,5 +100,5 @@ def model_regression(input_tensor):
 			conv_4, 2, 3, activation=None, name='conv_5')
 		max_pooling_1 = tf.compat.v1.layers.max_pooling2d(conv_5, pool_size=60, strides=60, padding='valid')
 		max_pooling_1 = tf.squeeze(max_pooling_1)
-		
+
 	return max_pooling_1
