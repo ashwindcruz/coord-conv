@@ -47,13 +47,13 @@ def model_rendering(input_tensor):
 
 	with tf.variable_scope('conv_model_rendering', reuse=tf.AUTO_REUSE):
 
-                classification_output = model_classification(input_tensor)
-                classification_vector = tf.reshape(
-                        classification_output, [-1, 4096])
-                classification_vector_softmax = tf.contrib.layers.softmax(
-                        classification_vector)
-                classification_pixel_map = tf.reshape(
-                        classification_vector_softmax, [-1, 64, 64, 1])
+		classification_output = model_classification(input_tensor)
+		classification_vector = tf.reshape(
+	            classification_output, [-1, 4096])
+		classification_vector_softmax = tf.contrib.layers.softmax(
+	            classification_vector)
+		classification_pixel_map = tf.reshape(
+	            classification_vector_softmax, [-1, 64, 64, 1])
 
 		conv_1 = tf.layers.conv2d(
 			classification_pixel_map, 8*channels, filter_size,
@@ -68,8 +68,7 @@ def model_rendering(input_tensor):
 			conv_3, 16*channels, filter_size,
 			padding='same', activation='relu', name='conv_4')
 		conv_5 = tf.layers.conv2d(
-			conv_4, 1, filter_size,
-			padding='same', name='conv_5')
+			conv_4, 1, filter_size, padding='same', name='conv_5')
 
 	return conv_5
 

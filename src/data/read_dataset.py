@@ -74,7 +74,6 @@ def get_data(start_index, indices, batch_size, method=None):
     elif method == 'regression':
         cartesian_coordinates_batch = cartesian_coordinates_batch
         pixel_centers_batch = np.expand_dims(pixel_centers_batch, axis=-1) * 1000
-        #pixel_centers_batch = np.repeat(pixel_centers_batch, 2, axis=-1)
 
         return cartesian_coordinates_batch, pixel_centers_batch, []
 
