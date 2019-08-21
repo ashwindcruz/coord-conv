@@ -39,19 +39,22 @@ classification_map = non_coordconv_models.model_classification(
 
 # Reshaping required for softmax
 output_vector = tf.reshape(classification_map, [-1, 4096])
+output_vector_softmax = tf.nn.softmax(output_vector)
+output_vector_label = tf.argmax(output_vector, axis=-1)
 
 # Loss placeholder
 expected_output = tf.placeholder(
     tf.float32, shape=(None, 4096), name='expected_output')
+expected_output_label = tf.argmax(expected_output, axis=-1)
 
 # Calculate the loss
 training_loss = tf.losses.softmax_cross_entropy(expected_output, output_vector)
 
 # Set up accuracy calculations
 train_acc, train_acc_op = tf.metrics.accuracy(
-    expected_output, tf.round(output_vector))
+    expected_output_label, output_vector_label)
 test_acc, test_acc_op = tf.metrics.accuracy(
-    expected_output, tf.round(output_vector))
+    expected_output_label, output_vector_label)
 
 
 # Set up the final loss, optimizer, and summaries
@@ -72,8 +75,8 @@ train_merged_summaries = tf.summary.merge(
     name='train_merged_summaries')
 
 # Set up images for tensorboard
-output_vector_activated = tf.nn.softmax(output_vector)
-images_output = tf.reshape(output_vector_activated, [-1, 64, 64, 1])
+output_vector_softmax = tf.nn.softmax(output_vector)
+images_output = tf.reshape(output_vector_softmax, [-1, 64, 64, 1])
 images_summary = tf.summary.image('output_images', images_output)
 
 
@@ -153,7 +156,7 @@ with tf.Session() as sess:
     for i in range(num_train_batches):
         start_index = i * cfg.BATCH_SIZE
         coord_batch, pixel_batch, _ = read_dataset.get_data(
-            start_index, training_idx, cfg.BATCH_SIZE, 'regression')
+            start_index, training_idx, cfg.BATCH_SIZE, 'deconv')
 
         train_acc_op_ = sess.run(
             train_acc_op,
@@ -169,7 +172,7 @@ with tf.Session() as sess:
     for i in range(num_test_batches):
         start_index = i * cfg.BATCH_SIZE
         coord_batch, pixel_batch, _ = read_dataset.get_data(
-            start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
+            start_index, testing_idx, cfg.BATCH_SIZE, 'deconv')
 
         test_acc_op_ = sess.run(
             test_acc_op,

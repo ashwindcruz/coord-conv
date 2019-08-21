@@ -42,20 +42,22 @@ output_map = coordconv_models.model_classification(coordinates_input_coord_conv)
 
 # Reshaping required for softmax cross entropy
 output_vector = tf.reshape(output_map, [-1, 4096])
+output_vector_softmax = tf.nn.softmax(output_vector)
+output_vector_label = tf.argmax(output_vector, axis=-1)
 
 # Loss placeholder
 expected_output = tf.placeholder(
     tf.float32, shape=(None, 4096), name='expected_output')
+expected_output_label = tf.argmax(expected_output, axis=-1)
 
 # Calculate the loss
 training_loss = tf.losses.softmax_cross_entropy(expected_output, output_vector)
 
 # Set up accuracy calculations
 train_acc, train_acc_op = tf.metrics.accuracy(
-    expected_output, tf.round(output_vector))
+    expected_output_label, output_vector_label)
 test_acc, test_acc_op = tf.metrics.accuracy(
-    expected_output, tf.round(output_vector))
-
+    expected_output_label, output_vector_label)
 
 # Set up the final loss, optimizer, and summaries
 optimizer = tf.train.AdamOptimizer(cfg.LEARNING_RATE)
@@ -72,7 +74,7 @@ train_merged_summaries = tf.summary.merge(
     [train_loss_summary], name='train_merged_summaries')
 
 # Set up images for tensorboard
-output_vector_softmax = tf.nn.softmax(output_vector)
+
 images_output = tf.reshape(output_vector_softmax, [-1, 64, 64, 1])
 images_summary = tf.summary.image('output_images', images_output)
 
@@ -107,11 +109,10 @@ with tf.Session() as sess:
 
 
             start_index = j * cfg.BATCH_SIZE
-            # coord_batch, pixel_batch, _  = read_dataset.get_data(
             coord_batch, pixel_batch, _ = read_dataset.get_data(
                 start_index, training_idx, cfg.BATCH_SIZE, 'coordconv')
 
-            summaries, _ = sess.run(
+            summaries, _, = sess.run(
                 [train_merged_summaries, train_op],
                 feed_dict={
                     coordinates_input:coord_batch,
@@ -130,7 +131,7 @@ with tf.Session() as sess:
                         expected_output:pixel_batch
                         }
                     )
-                print('Batch: {:7.1f}, Training Loss: {:12.7f}'.format(
+                print('Batch: {:7f}, Training Loss: {:12.7f}'.format(
                     training_step,
                     training_loss_))
 
@@ -152,24 +153,22 @@ with tf.Session() as sess:
     for i in range(num_train_batches):
         start_index = i * cfg.BATCH_SIZE
         coord_batch, pixel_batch, _ = read_dataset.get_data(
-            start_index, training_idx, cfg.BATCH_SIZE, 'regression')
+            start_index, training_idx, cfg.BATCH_SIZE, 'coordconv')
 
         train_acc_op_ = sess.run(
             train_acc_op,
             feed_dict={
                 coordinates_input:coord_batch, expected_output:pixel_batch}
             )
-
     total_accuracy = sess.run(train_acc)
 
     print('Train set accuracy: {}'.format(total_accuracy*100))
-
 
     # After training, calculate the accuracy on the test set
     for i in range(num_test_batches):
         start_index = i * cfg.BATCH_SIZE
         coord_batch, pixel_batch, _ = read_dataset.get_data(
-            start_index, testing_idx, cfg.BATCH_SIZE, 'regression')
+            start_index, testing_idx, cfg.BATCH_SIZE, 'coordconv')
 
         test_acc_op_ = sess.run(
             test_acc_op,
