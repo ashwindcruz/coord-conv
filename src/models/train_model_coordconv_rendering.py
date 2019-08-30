@@ -90,10 +90,12 @@ with tf.Session() as sess:
     first_idx = np.random.permutation(len(training_idx))[0]
     tensorboard_batch, _, _ = read_dataset.get_data(
         first_idx, training_idx, cfg.BATCH_SIZE, 'coordconv')
+    print(tensorboard_batch[0:3, 0,0,:])
 
     first_idx = np.random.permutation(len(testing_idx))[0]
     tensorboard_test_batch, _, _ = read_dataset.get_data(
         first_idx, testing_idx, cfg.BATCH_SIZE, 'coordconv')
+    print(tensorboard_test_batch[0:3, 0,0,:])
 
     # Begin training
     num_train_batches = read_dataset.num_training_examples // cfg.BATCH_SIZE
