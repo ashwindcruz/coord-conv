@@ -12,20 +12,20 @@ TENSORBOARD_DIR = '../results/tensorboard_logs/'
 DEBUG_DIR = '../results/debug/'
 
 # Type of split to apply to dataset
-SPLIT = 'uniform'
+SPLIT = 'quadrant'
 
 # Dimensions desired for input, channels must be kept as 3
-BATCH_SIZE = 30
+BATCH_SIZE = 32
 
 # Learning rate for optimizer
-LEARNING_RATE = 1e-2
-WEIGHT_DECAY = 1e-2
+LEARNING_RATE = 1e-3
+WEIGHT_DECAY = 1e-13
 
 # Number of training and validation step
 # In this instance, validation refers to when we would like to examine:
 # save currently optimized image and loss
-TRAINING_EPOCHS = 100#100
-TENSORBOARD_STEPS = 10
+TRAINING_EPOCHS = 150
+TENSORBOARD_STEPS = 100
 
 # Offline debugging refers to images that will be saved to folder using plt,
 # every validation step
