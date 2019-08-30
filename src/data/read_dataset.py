@@ -41,6 +41,9 @@ def get_indices(split):
         testing_indices = np.reshape(indices[28:,28:], 784)
         training_indices = np.array(list(set(indices_vector)-set(testing_indices)))
 
+        np.random.shuffle(testing_indices)
+        np.random.shuffle(training_indices)
+
     return training_indices, testing_indices
 
 def get_data(start_index, indices, batch_size, method=None):
